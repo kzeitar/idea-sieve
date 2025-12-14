@@ -1,0 +1,3 @@
+{
+	"extends": "@idea-sieve/config/tsconfig.base.json"
+}

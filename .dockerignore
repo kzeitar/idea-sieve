@@ -1,0 +1,92 @@
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment files (security)
+.env
+.env.local
+.env*.local
+**/.env
+**/.env.local
+
+# Build outputs
+dist
+build
+.turbo
+**/.turbo
+.next
+out
+*.tsbuildinfo
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Testing and coverage
+coverage
+.nyc_output
+*.test.ts
+*.spec.ts
+**/__tests__
+
+# Documentation (not needed in container)
+*.md
+!README.md
+
+# Cache and temp files
+.cache
+tmp
+temp
+.tmp
+
+# Database files (handled by volumes)
+*.db
+*.sqlite
+*.sqlite3
+data
+**/data
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Husky and git hooks
+.husky
+
+# Development tools
+.eslintrc*
+.prettierrc*
+biome.json
+tsconfig.json
+**/tsconfig.json
+
+# Better-T-Stack
+.alchemy
+.serena
+
+# Tanstack
+.tanstack
+**/.tanstack
