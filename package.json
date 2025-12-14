@@ -1,0 +1,48 @@
+{
+	"name": "idea-sieve",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"type": "module",
+	"scripts": {
+		"check": "biome check --write .",
+		"prepare": "husky",
+		"dev": "turbo dev",
+		"build": "turbo build",
+		"check-types": "turbo check-types",
+		"dev:native": "turbo -F native dev",
+		"dev:web": "turbo -F web dev",
+		"dev:server": "turbo -F server dev",
+		"db:push": "turbo -F @idea-sieve/db db:push",
+		"db:studio": "turbo -F @idea-sieve/db db:studio",
+		"db:generate": "turbo -F @idea-sieve/db db:generate",
+		"db:migrate": "turbo -F @idea-sieve/db db:migrate",
+		"db:seed": "turbo -F @idea-sieve/db db:seed",
+		"db:start": "turbo -F @idea-sieve/db db:start",
+		"db:watch": "turbo -F @idea-sieve/db db:watch",
+		"db:stop": "turbo -F @idea-sieve/db db:stop",
+		"db:down": "turbo -F @idea-sieve/db db:down"
+	},
+	"dependencies": {
+		"dotenv": "catalog:",
+		"zod": "catalog:",
+		"@idea-sieve/env": "workspace:*"
+	},
+	"devDependencies": {
+		"turbo": "^2.6.3",
+		"@biomejs/biome": "^2.2.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.1.2",
+		"typescript": "catalog:",
+		"@types/bun": "catalog:",
+		"@idea-sieve/config": "workspace:*"
+	},
+	"lint-staged": {
+		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+			"biome check --write ."
+		]
+	},
+	"packageManager": "pnpm@10.16.1"
+}
