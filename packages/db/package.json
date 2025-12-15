@@ -1,0 +1,41 @@
+{
+	"name": "@idea-sieve/db",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {
+		"db:push": "prisma db push",
+		"db:generate": "prisma generate",
+		"db:migrate": "prisma migrate dev",
+		"db:seed": "tsx prisma/seed.ts",
+		"db:studio": "prisma studio",
+		"db:start": "docker compose up -d",
+		"db:watch": "docker compose up",
+		"db:stop": "docker compose stop",
+		"db:down": "docker compose down"
+	},
+	"prisma": {
+		"seed": "tsx prisma/seed.ts"
+	},
+	"devDependencies": {
+		"prisma": "^7.1.0",
+		"@types/pg": "^8.15.6",
+		"tsx": "^4.21.0",
+		"typescript": "catalog:",
+		"@idea-sieve/config": "workspace:*"
+	},
+	"dependencies": {
+		"@prisma/client": "catalog:",
+		"@prisma/adapter-pg": "^7.1.0",
+		"pg": "^8.16.3",
+		"dotenv": "catalog:",
+		"zod": "catalog:",
+		"@idea-sieve/env": "workspace:*"
+	}
+}
