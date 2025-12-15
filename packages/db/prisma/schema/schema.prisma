@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated"
+  moduleFormat = "esm"
+  runtime = "bun"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// IDEA MANAGEMENT
+// ============================================================================
+
+model Idea {
+  id               String   @id @default(cuid())
+  ideaName         String
+  ideaDescription  String   @db.Text
+  ideaType         String   // IdeaType enum: saas, micro-saas, mobile-app, chrome-extension, api-tool, marketplace, info-product, generic
+  targetAudience   String?  @db.Text
+  proposedFeatures String[] // Array of feature descriptions
+  customization    Json?    // CustomizationOptions stored as JSON
+
+  // Timestamps
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  validation       IdeaValidation?
+  validationJobs   ValidationJob[]
+
+  @@index([ideaType])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// IDEA VALIDATION (1-to-1 with Idea)
+// ============================================================================
+
+model IdeaValidation {
+  id                String   @id @default(cuid())
+  ideaId            String   @unique
+
+  // Extracted fields for efficient querying
+  overallScore      Float    // 0-10 score
+  recommendation    String   // RecommendationType enum: BUILD_NOW, BUILD_WITH_CAUTION, PIVOT_REQUIRED, DO_NOT_BUILD
+  validatedAt       DateTime
+
+  // Full validation report stored as JSON
+  validationReport  Json     // Complete ValidationReport object
+
+  // Timestamps
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  idea              Idea           @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  validationJobs    ValidationJob[] // Jobs that created this validation
+
+  @@index([overallScore])
+  @@index([recommendation])
+  @@index([validatedAt])
+}
+
+// ============================================================================
+// VALIDATION FRAMEWORKS
+// ============================================================================
+
+model Framework {
+  id            String   @id @default(cuid())
+  ideaType      String   @unique // IdeaType enum - ensures one framework per idea type
+  name          String
+  version       String
+  description   String   @db.Text
+
+  // Full framework data stored as JSON
+  frameworkData Json     // Complete Framework object with all evaluation criteria
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([ideaType])
+}
+
+// ============================================================================
+// VALIDATION JOBS (Tracks validation progress and state)
+// ============================================================================
+
+model ValidationJob {
+  id        String   @id @default(cuid())
+  ideaId    String
+
+  // Job status tracking
+  status    String   // ValidationJobStatus enum: queued, processing, completed, failed
+
+  // Progress tracking
+  currentTaskIndex Int @default(0)  // Track which task is being executed
+  totalTasks       Int @default(0)  // Total number of tasks
+
+  // Results
+  validationId String? @unique  // Link to final IdeaValidation
+  error        String? @db.Text // Error message if failed
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  startedAt   DateTime? // When processing started
+  completedAt DateTime? // When completed/failed
+
+  // Relations
+  idea         Idea                    @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  taskResults  ValidationTaskResult[]  // Individual task results
+  validation   IdeaValidation?         @relation(fields: [validationId], references: [id])
+
+  @@index([ideaId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// VALIDATION TASK RESULTS (Individual task execution results)
+// ============================================================================
+
+model ValidationTaskResult {
+  id        String   @id @default(cuid())
+  jobId     String
+  taskId    String   // task_1, task_2, etc.
+
+  // Task details
+  title       String
+  description String   @db.Text
+  status      String   // pending, in_progress, completed, failed
+
+  // Results
+  result    String?  @db.Text  // Task execution result
+  error     String?  @db.Text  // Error message if failed
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  // Relations
+  job       ValidationJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, taskId])
+  @@index([jobId])
+  @@index([status])
+}
