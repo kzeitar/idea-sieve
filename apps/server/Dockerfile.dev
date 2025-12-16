@@ -1,0 +1,57 @@
+# ============================================================================
+# BACKEND DOCKERFILE - DEVELOPMENT
+# ============================================================================
+# Development-optimized Dockerfile with hot-reload support
+# ============================================================================
+
+FROM oven/bun:1-alpine AS development
+
+WORKDIR /app
+
+# Install dependencies for development
+RUN apk add --no-cache git wget
+
+# Install pnpm 10.16.1 using standalone binary (detect architecture)
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "aarch64" ]; then PNPM_ARCH="arm64"; else PNPM_ARCH="x64"; fi && \
+    wget -qO /usr/local/bin/pnpm "https://github.com/pnpm/pnpm/releases/download/v10.16.1/pnpm-linuxstatic-${PNPM_ARCH}" && \
+    chmod +x /usr/local/bin/pnpm
+
+# Copy package manager files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY .npmrc* ./
+
+# Copy all package.json files
+COPY apps/server/package.json ./apps/server/
+COPY packages/db/package.json ./packages/db/
+COPY packages/env/package.json ./packages/env/
+COPY packages/ai/package.json ./packages/ai/
+COPY packages/config/package.json ./packages/config/
+
+# Install all dependencies (including dev dependencies)
+RUN pnpm install --frozen-lockfile
+
+# Copy workspace configuration
+COPY turbo.json ./
+
+# Copy all source code (will be overridden by volume mount)
+COPY apps/server ./apps/server
+COPY packages ./packages
+
+# Generate Prisma client
+# Set dummy DATABASE_URL for build-time generation (not used for actual connection)
+ENV DATABASE_URL="postgresql://dummy:dummy@dummy:5432/dummy"
+RUN cd packages/db && bunx prisma generate
+
+# Set working directory
+WORKDIR /app/apps/server
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD bun run -e "fetch('http://localhost:3000').then(() => process.exit(0)).catch(() => process.exit(1))"
+
+# Start with hot-reload
+CMD ["bun", "run", "--hot", "src/index.ts"]
