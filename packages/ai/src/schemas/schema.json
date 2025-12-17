@@ -1,0 +1,564 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "ValidationReport",
+	"description": "Structured output schema for AI Idea Validator",
+	"type": "object",
+	"required": [
+		"ideaName",
+		"ideaType",
+		"validatedAt",
+		"overallScore",
+		"recommendation",
+		"executiveSummary",
+		"marketAnalysis",
+		"differentiation",
+		"technicalFeasibility",
+		"monetization",
+		"userAcquisition",
+		"risks",
+		"opportunities",
+		"nextSteps",
+		"pivotRecommendations",
+		"buildRecommendations",
+		"alternativeDirections",
+		"dealBreakers",
+		"criticalSuccessFactors",
+		"assumptions",
+		"dataQuality"
+	],
+	"properties": {
+		"ideaName": {
+			"type": "string",
+			"description": "Name of the idea being validated"
+		},
+		"ideaType": {
+			"type": "string",
+			"enum": [
+				"saas",
+				"micro-saas",
+				"mobile-app",
+				"chrome-extension",
+				"api-tool",
+				"marketplace",
+				"info-product",
+				"generic"
+			]
+		},
+		"validatedAt": {
+			"type": "string",
+			"format": "date-time"
+		},
+		"overallScore": {
+			"type": "number",
+			"minimum": 0,
+			"maximum": 10
+		},
+		"recommendation": {
+			"type": "string",
+			"enum": [
+				"BUILD_NOW",
+				"BUILD_WITH_CAUTION",
+				"PIVOT_REQUIRED",
+				"DO_NOT_BUILD"
+			]
+		},
+		"executiveSummary": {
+			"type": "string",
+			"description": "2-4 sentence summary of the assessment"
+		},
+		"marketAnalysis": {
+			"type": "object",
+			"required": [
+				"score",
+				"marketSize",
+				"competitors",
+				"competitorCount",
+				"marketTrends",
+				"userDemand",
+				"saturation"
+			],
+			"properties": {
+				"score": { "$ref": "#/definitions/Score" },
+				"marketSize": {
+					"type": "object",
+					"required": ["description"],
+					"properties": {
+						"description": { "type": "string" },
+						"estimatedValue": { "type": "string" },
+						"growthRate": { "type": "string" },
+						"sources": {
+							"type": "array",
+							"items": { "type": "string" }
+						}
+					}
+				},
+				"competitors": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/Competitor" }
+				},
+				"competitorCount": {
+					"type": "object",
+					"required": ["direct", "indirect"],
+					"properties": {
+						"direct": { "type": "integer", "minimum": 0 },
+						"indirect": { "type": "integer", "minimum": 0 }
+					}
+				},
+				"marketTrends": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"userDemand": {
+					"type": "object",
+					"required": ["level", "evidence"],
+					"properties": {
+						"level": {
+							"type": "string",
+							"enum": ["low", "moderate", "high", "very-high"]
+						},
+						"evidence": {
+							"type": "array",
+							"items": { "type": "string" }
+						}
+					}
+				},
+				"saturation": {
+					"type": "object",
+					"required": ["level", "analysis"],
+					"properties": {
+						"level": {
+							"type": "string",
+							"enum": ["low", "moderate", "high", "oversaturated"]
+						},
+						"analysis": { "type": "string" }
+					}
+				}
+			}
+		},
+		"differentiation": {
+			"type": "object",
+			"required": [
+				"score",
+				"uniqueValueProposition",
+				"keyDifferentiators",
+				"competitiveAdvantages",
+				"weaknesses",
+				"moatPotential"
+			],
+			"properties": {
+				"score": { "$ref": "#/definitions/Score" },
+				"uniqueValueProposition": { "type": "string" },
+				"keyDifferentiators": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"competitiveAdvantages": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"weaknesses": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"moatPotential": {
+					"type": "object",
+					"required": ["rating", "explanation"],
+					"properties": {
+						"rating": {
+							"type": "string",
+							"enum": ["none", "weak", "moderate", "strong"]
+						},
+						"explanation": { "type": "string" }
+					}
+				}
+			}
+		},
+		"technicalFeasibility": {
+			"type": "object",
+			"required": [
+				"score",
+				"complexityLevel",
+				"requiredSkills",
+				"estimatedDevTime",
+				"technicalChallenges",
+				"requiredInfrastructure",
+				"thirdPartyDependencies"
+			],
+			"properties": {
+				"score": { "$ref": "#/definitions/Score" },
+				"complexityLevel": {
+					"type": "string",
+					"enum": ["low", "moderate", "high", "very-high"]
+				},
+				"requiredSkills": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"estimatedDevTime": {
+					"type": "object",
+					"required": ["mvp", "fullVersion"],
+					"properties": {
+						"mvp": { "type": "string" },
+						"fullVersion": { "type": "string" }
+					}
+				},
+				"technicalChallenges": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"requiredInfrastructure": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"thirdPartyDependencies": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"scalabilityConcerns": {
+					"type": "array",
+					"items": { "type": "string" }
+				}
+			}
+		},
+		"monetization": {
+			"type": "object",
+			"required": [
+				"score",
+				"recommendedModels",
+				"revenueProjection",
+				"pricingStrategy",
+				"competitorPricing"
+			],
+			"properties": {
+				"score": { "$ref": "#/definitions/Score" },
+				"recommendedModels": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/MonetizationModel" }
+				},
+				"revenueProjection": {
+					"type": "object",
+					"required": ["optimistic", "realistic", "pessimistic", "timeframe"],
+					"properties": {
+						"optimistic": { "type": "string" },
+						"realistic": { "type": "string" },
+						"pessimistic": { "type": "string" },
+						"timeframe": { "type": "string" }
+					}
+				},
+				"pricingStrategy": { "type": "string" },
+				"competitorPricing": {
+					"type": "object",
+					"required": ["low", "average", "high"],
+					"properties": {
+						"low": { "type": "string" },
+						"average": { "type": "string" },
+						"high": { "type": "string" }
+					}
+				},
+				"ltv_cac_ratio": {
+					"type": "object",
+					"required": ["estimated", "viability"],
+					"properties": {
+						"estimated": { "type": "number" },
+						"viability": { "type": "string" }
+					}
+				}
+			}
+		},
+		"userAcquisition": {
+			"type": "object",
+			"required": [
+				"score",
+				"difficulty",
+				"recommendedChannels",
+				"estimatedCAC",
+				"organicPotential"
+			],
+			"properties": {
+				"score": { "$ref": "#/definitions/Score" },
+				"difficulty": {
+					"type": "string",
+					"enum": ["easy", "moderate", "hard", "very-hard"]
+				},
+				"recommendedChannels": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/AcquisitionChannel" }
+				},
+				"estimatedCAC": {
+					"type": "object",
+					"required": ["range", "reasoning"],
+					"properties": {
+						"range": { "type": "string" },
+						"reasoning": { "type": "string" }
+					}
+				},
+				"organicPotential": {
+					"type": "object",
+					"required": ["level", "explanation"],
+					"properties": {
+						"level": {
+							"type": "string",
+							"enum": ["low", "moderate", "high"]
+						},
+						"explanation": { "type": "string" }
+					}
+				},
+				"viralCoefficient": {
+					"type": "object",
+					"required": ["estimated", "reasoning"],
+					"properties": {
+						"estimated": { "type": "number" },
+						"reasoning": { "type": "string" }
+					}
+				}
+			}
+		},
+		"risks": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/Risk" }
+		},
+		"opportunities": {
+			"type": "array",
+			"items": { "type": "string" }
+		},
+		"legalConsiderations": {
+			"type": "object",
+			"required": ["compliance", "regulations", "privacyRequirements", "risks"],
+			"properties": {
+				"compliance": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"regulations": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"privacyRequirements": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"risks": {
+					"type": "array",
+					"items": { "type": "string" }
+				}
+			}
+		},
+		"nextSteps": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/ActionItem" }
+		},
+		"pivotRecommendations": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/PivotRecommendation" }
+		},
+		"buildRecommendations": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/BuildRecommendation" }
+		},
+		"alternativeDirections": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/AlternativeDirection" }
+		},
+		"dealBreakers": {
+			"type": "array",
+			"items": { "type": "string" }
+		},
+		"criticalSuccessFactors": {
+			"type": "array",
+			"items": { "type": "string" }
+		},
+		"assumptions": {
+			"type": "array",
+			"items": { "type": "string" }
+		},
+		"dataQuality": {
+			"type": "object",
+			"required": ["score", "notes"],
+			"properties": {
+				"score": {
+					"type": "number",
+					"minimum": 0,
+					"maximum": 100
+				},
+				"notes": { "type": "string" }
+			}
+		}
+	},
+	"definitions": {
+		"Score": {
+			"type": "object",
+			"required": ["value", "reasoning", "confidence"],
+			"properties": {
+				"value": {
+					"type": "number",
+					"minimum": 0,
+					"maximum": 10
+				},
+				"reasoning": { "type": "string" },
+				"confidence": {
+					"type": "number",
+					"minimum": 0,
+					"maximum": 100
+				}
+			}
+		},
+		"Competitor": {
+			"type": "object",
+			"required": ["name", "description", "strengths", "weaknesses"],
+			"properties": {
+				"name": { "type": "string" },
+				"description": { "type": "string" },
+				"website": { "type": "string" },
+				"strengths": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"weaknesses": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"marketShare": {
+					"type": "string",
+					"enum": ["dominant", "significant", "emerging", "niche"]
+				},
+				"pricing": { "type": "string" },
+				"lastUpdated": { "type": "string" }
+			}
+		},
+		"MonetizationModel": {
+			"type": "object",
+			"required": ["type", "description", "pros", "cons", "fitScore"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"subscription",
+						"one-time",
+						"freemium",
+						"usage-based",
+						"ads",
+						"marketplace",
+						"hybrid"
+					]
+				},
+				"description": { "type": "string" },
+				"pros": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"cons": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"fitScore": {
+					"type": "number",
+					"minimum": 0,
+					"maximum": 10
+				}
+			}
+		},
+		"AcquisitionChannel": {
+			"type": "object",
+			"required": [
+				"channel",
+				"effectiveness",
+				"cost",
+				"timeToResults",
+				"description"
+			],
+			"properties": {
+				"channel": { "type": "string" },
+				"effectiveness": {
+					"type": "string",
+					"enum": ["low", "moderate", "high"]
+				},
+				"cost": {
+					"type": "string",
+					"enum": ["low", "moderate", "high"]
+				},
+				"timeToResults": { "type": "string" },
+				"description": { "type": "string" }
+			}
+		},
+		"Risk": {
+			"type": "object",
+			"required": ["category", "level", "description", "impact"],
+			"properties": {
+				"category": { "type": "string" },
+				"level": {
+					"type": "string",
+					"enum": ["low", "medium", "high", "critical"]
+				},
+				"description": { "type": "string" },
+				"mitigation": { "type": "string" },
+				"impact": {
+					"type": "string",
+					"enum": ["low", "medium", "high", "critical"]
+				}
+			}
+		},
+		"ActionItem": {
+			"type": "object",
+			"required": ["priority", "action", "reasoning"],
+			"properties": {
+				"priority": {
+					"type": "string",
+					"enum": ["critical", "high", "medium", "low"]
+				},
+				"action": { "type": "string" },
+				"reasoning": { "type": "string" },
+				"estimatedEffort": { "type": "string" }
+			}
+		},
+		"PivotRecommendation": {
+			"type": "object",
+			"required": [
+				"title",
+				"description",
+				"reasoning",
+				"priority",
+				"estimatedImpact"
+			],
+			"properties": {
+				"title": { "type": "string" },
+				"description": { "type": "string" },
+				"reasoning": { "type": "string" },
+				"priority": {
+					"type": "string",
+					"enum": ["critical", "high", "medium", "low"]
+				},
+				"estimatedImpact": { "type": "string" }
+			}
+		},
+		"BuildRecommendation": {
+			"type": "object",
+			"required": ["title", "description", "priority", "category"],
+			"properties": {
+				"title": { "type": "string" },
+				"description": { "type": "string" },
+				"priority": {
+					"type": "string",
+					"enum": ["critical", "high", "medium", "low"]
+				},
+				"category": {
+					"type": "string",
+					"enum": ["product", "market", "technical", "business"]
+				}
+			}
+		},
+		"AlternativeDirection": {
+			"type": "object",
+			"required": ["title", "description", "viabilityScore", "reasoning"],
+			"properties": {
+				"title": { "type": "string" },
+				"description": { "type": "string" },
+				"viabilityScore": {
+					"type": "number",
+					"minimum": 0,
+					"maximum": 10
+				},
+				"reasoning": { "type": "string" }
+			}
+		}
+	}
+}
