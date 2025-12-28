@@ -1,5 +1,569 @@
-# Idea Sieve
+# 🔍 Idea Sieve - AI-Powered Idea Validator
 
-AI-powered idea validation system.
+<div align="center">
 
-Coming soon...
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
+**A rigorous, honest, and evidence-based system for validating startup and product ideas.**
+
+Built with TypeScript, React, Hono, [AI SDK](https://ai-sdk.dev/), and OpenAI • Powered by Bun
+
+[Quick Start](#-quick-start-with-docker) • [Features](#-features) • [Architecture](#-architecture) • [Manual Setup](#-manual-installation) • [Contributing](#-contributing)
+
+</div>
+
+---
+
+## 🚀 Quick Start with Docker (Recommended)
+
+Get up and running in **under 2 minutes**:
+
+### Prerequisites
+- Docker and Docker Compose installed ([Get Docker](https://docs.docker.com/get-docker/))
+- OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
+- Tavily API key ([Get one here](https://tavily.com))
+
+### Steps
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/kzeitar/idea-sieve.git
+cd idea-sieve
+```
+
+2. **Set up environment variables**
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your API keys:
+```bash
+# Required: Add your actual API keys
+OPENAI_API_KEY=sk-proj-your-actual-openai-key
+TAVILY_API_KEY=tvly-your-actual-tavily-key
+
+# These are pre-configured for Docker
+DATABASE_URL=postgresql://postgres:password@postgres:5432/idea-sieve
+CORS_ORIGIN=http://localhost:3002  # 3002 for development, 3001 for production
+VITE_SERVER_URL=http://localhost:3000
+```
+
+3. **Start the application**
+```bash
+docker-compose up
+```
+
+4. **Access the application**
+- 🌐 **Web App**: http://localhost:3001 (production) or http://localhost:3002 (development)
+- 🔌 **API**: http://localhost:3000
+- 📊 **Database**: PostgreSQL on port 5432
+
+That's it! The application is now running with a complete stack including the database, backend, and frontend.
+
+> **Note**: Production mode uses port 3001, while development mode (with hot-reload) uses port 3002 to avoid port conflicts.
+
+### Docker Commands
+
+```bash
+# Start in production mode
+docker-compose up
+
+# Start in background (detached mode)
+docker-compose up -d
+
+# Stop the application
+docker-compose down
+
+# Stop and remove volumes (clean slate)
+docker-compose down -v
+
+# View logs
+docker-compose logs -f
+
+# Rebuild after code changes
+docker-compose up --build
+
+# Development mode with hot-reload (see Development section)
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
+---
+
+## ✨ Features
+
+### 🎯 Configurable Assessment Styles
+
+Choose the validation tone that matches your needs:
+
+- **Brutal** 🔥 - Harshly critical, very high standards, emphasizes every risk
+- **Balanced** ⚖️ - Fair and honest, constructive criticism (DEFAULT)
+- **Encouraging** 💪 - Supportive while honest, focuses on solving challenges
+- **Optimistic** ✨ - Highlights potential and opportunities, growth-focused
+
+**All tones maintain:**
+- ✅ Real competitor research with actual company names
+- ✅ Evidence-based assessments on market data
+- ✅ Specific, actionable feedback
+- ✅ Honest risk identification
+- ❌ Never fabricate statistics or competitors
+
+### 🔬 Validation Framework
+
+- **Multi-stage validation** with research tasks and analysis
+- **Real-time progress updates** using Server-Sent Events (SSE)
+- **Competitor research** using Tavily AI search
+- **Evidence-based recommendations** with market data
+- **Detailed scoring** across multiple dimensions
+- **Actionable insights** for next steps
+
+### 📊 Supported Idea Types
+
+- SaaS (Software as a Service)
+- Micro-SaaS
+- Mobile Applications
+- Chrome Extensions
+- API Tools
+- Marketplaces
+- Information Products (courses, ebooks, templates)
+- Generic products
+
+---
+
+## 🏗️ Architecture
+
+### Tech Stack
+
+**Frontend (apps/web)**
+- ⚛️ **React 19** - Modern UI library
+- 🔀 **TanStack Router** - File-based routing with full type safety
+- 🎨 **TailwindCSS 4** - Utility-first CSS
+- 🧩 **shadcn/ui** - Reusable UI components
+- 📡 **TanStack Query** - Server state management
+- 🔥 **Vite** - Lightning-fast build tool
+
+**Backend (apps/server)**
+- 🔥 **Hono** - Lightweight, ultra-fast web framework
+- ⚡ **Bun** - Fast JavaScript runtime
+- 📡 **Server-Sent Events** - Real-time progress updates
+
+**AI (packages/ai)**
+- 🤖 **AI SDK** - AI-powered validation
+- 🔍 **Tavily AI** - Web research and competitor analysis
+
+**Database (packages/db)**
+- 🐘 **PostgreSQL** - Reliable relational database
+- 🔷 **Prisma** - TypeScript-first ORM
+- 🐳 **Docker** - Containerized database
+
+**Monorepo Tools**
+- 📦 **pnpm** - Fast, disk space efficient package manager
+- ⚡ **Turborepo** - High-performance build system
+- 🎯 **TypeScript** - End-to-end type safety
+- 🧹 **Biome** - Fast linting and formatting
+- 🪝 **Husky** - Git hooks for code quality
+
+### Project Structure
+
+```
+idea-sieve/
+├── apps/
+│   ├── web/              # React frontend (Vite + TanStack Router)
+│   │   ├── src/          # Source code
+│   │   ├── Dockerfile    # Production Docker image
+│   │   └── Dockerfile.dev # Development Docker image
+│   └── server/           # Hono backend API
+│       ├── src/          # Source code
+│       ├── Dockerfile    # Production Docker image
+│       └── Dockerfile.dev # Development Docker image
+├── packages/
+│   ├── ai/               # AI validation logic (OpenAI + Tavily)
+│   ├── db/               # Database schema & queries (Prisma)
+│   ├── env/              # Environment variable validation
+│   └── config/           # Shared TypeScript config
+├── docker-compose.yml    # Production stack
+├── docker-compose.dev.yml # Development overrides
+├── .env.example          # Environment template
+└── README.md            # You are here!
+```
+
+### How It Works
+
+```
+┌─────────────┐      ┌──────────────┐      ┌─────────────┐
+│             │      │              │      │             │
+│   React     │─────▶│   Hono API   │─────▶│  PostgreSQL │
+│   Frontend  │◀─────│   (Bun)      │◀─────│   Database  │
+│             │ SSE  │              │      │             │
+└─────────────┘      └──────────────┘      └─────────────┘
+                            │
+                            ▼
+                     ┌──────────────┐
+                     │              │
+                     │  OpenAI +    │
+                     │  Tavily AI   │
+                     │              │
+                     └──────────────┘
+```
+
+1. User submits an idea through the React frontend
+2. Backend creates a validation job and streams progress via SSE
+3. AI agent performs research tasks using OpenAI and Tavily
+4. Results are stored in PostgreSQL and streamed back to the frontend
+5. User receives a comprehensive validation report
+
+---
+
+## 💻 Manual Installation
+
+If you prefer not to use Docker:
+
+### Prerequisites
+
+- [Bun](https://bun.sh) (v1.0+) or [Node.js](https://nodejs.org) (v18+)
+- [pnpm](https://pnpm.io) (v8+)
+- [PostgreSQL](https://www.postgresql.org) (v14+)
+
+### Steps
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/kzeitar/idea-sieve.git
+cd idea-sieve
+```
+
+2. **Install dependencies**
+```bash
+pnpm install
+```
+
+3. **Set up environment variables**
+
+Create `.env` files in the following locations:
+
+**`apps/server/.env`**
+```bash
+DATABASE_URL=postgresql://postgres:password@localhost:5432/idea-sieve
+OPENAI_API_KEY=sk-proj-your-openai-api-key
+TAVILY_API_KEY=tvly-your-tavily-api-key
+CORS_ORIGIN=http://localhost:3001
+```
+
+**`apps/web/.env`**
+```bash
+VITE_SERVER_URL=http://localhost:3000
+```
+
+**`packages/db/.env`**
+```bash
+DATABASE_URL=postgresql://postgres:password@localhost:5432/idea-sieve
+```
+
+4. **Start PostgreSQL**
+
+Using Docker:
+```bash
+pnpm run db:start
+```
+
+Or start your own PostgreSQL instance and create a database named `idea-sieve`.
+
+5. **Push database schema**
+```bash
+pnpm run db:push
+```
+
+6. **Start development servers**
+```bash
+pnpm run dev
+```
+
+This will start:
+- Frontend: http://localhost:3001
+- Backend: http://localhost:3000
+- Database: PostgreSQL on port 5432
+
+### Available Scripts
+
+```bash
+# Development
+pnpm run dev              # Start all services
+pnpm run dev:web          # Start only frontend
+pnpm run dev:server       # Start only backend
+
+# Building
+pnpm run build            # Build all applications
+pnpm run check-types      # Type-check all packages
+
+# Database
+pnpm run db:push          # Push schema changes
+pnpm run db:studio        # Open Prisma Studio
+pnpm run db:generate      # Generate Prisma client
+pnpm run db:migrate       # Run migrations
+pnpm run db:seed          # Seed the database
+pnpm run db:start         # Start PostgreSQL (Docker)
+pnpm run db:stop          # Stop PostgreSQL (Docker)
+
+# Code Quality
+pnpm run check            # Run Biome linting and formatting
+```
+
+---
+
+## 🔧 Development
+
+### Development with Docker (Hot-Reload)
+
+For a development environment with hot-reload:
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
+This mounts the source code into the containers, so changes are reflected immediately without rebuilding.
+
+**Access the development environment:**
+- 🌐 **Web App**: http://localhost:3002 (note: different port than production)
+- 🔌 **API**: http://localhost:3000
+- 📊 **Database**: PostgreSQL on port 5432
+
+> **Note**: Development mode uses port 3002 for the frontend to avoid conflicts with other services.
+
+### Development without Docker
+
+```bash
+# Terminal 1: Start PostgreSQL
+pnpm run db:start
+
+# Terminal 2: Start all dev servers
+pnpm run dev
+
+# Or start services individually
+pnpm run dev:server    # Backend only
+pnpm run dev:web       # Frontend only
+```
+
+### Database Management
+
+```bash
+# View/edit data in Prisma Studio
+pnpm run db:studio
+
+# Push schema changes without migrations (development)
+pnpm run db:push
+
+# Create a migration (production)
+pnpm run db:migrate
+
+# Regenerate Prisma client after schema changes
+pnpm run db:generate
+```
+
+---
+
+## 🌐 Environment Variables
+
+### Required Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `OPENAI_API_KEY` | OpenAI API key for AI validation | `sk-proj-...` |
+| `TAVILY_API_KEY` | Tavily API key for web research | `tvly-...` |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host:5432/db` |
+| `CORS_ORIGIN` | Frontend URL for CORS | `http://localhost:3002` (dev) or `http://localhost:3001` (prod) |
+| `VITE_SERVER_URL` | Backend API URL (frontend) | `http://localhost:3000` |
+
+### Optional Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NODE_ENV` | Environment mode | `development` |
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run tests (when implemented)
+pnpm test
+
+# Type checking
+pnpm run check-types
+
+# Linting and formatting
+pnpm run check
+```
+
+---
+
+## 🐳 Docker Deployment
+
+### Production Deployment
+
+1. **Build production images**
+```bash
+docker-compose build
+```
+
+2. **Deploy to your server**
+```bash
+# On your server
+docker-compose up -d
+```
+
+3. **Run database migrations**
+```bash
+docker-compose exec server bun run db:push
+```
+
+### Environment-Specific Configuration
+
+For production, create a `.env.production` file:
+
+```bash
+DATABASE_URL=postgresql://user:password@prod-db:5432/idea-sieve
+OPENAI_API_KEY=sk-proj-production-key
+TAVILY_API_KEY=tvly-production-key
+CORS_ORIGIN=https://yourdomain.com
+VITE_SERVER_URL=https://api.yourdomain.com
+NODE_ENV=production
+```
+
+Then use it with:
+```bash
+docker-compose --env-file .env.production up -d
+```
+
+---
+
+## 📝 API Documentation
+
+### Endpoints
+
+#### Ideas
+- `GET /api/ideas` - List all ideas
+- `POST /api/ideas` - Create a new idea
+- `GET /api/ideas/:id` - Get idea details
+- `PUT /api/ideas/:id` - Update an idea
+- `DELETE /api/ideas/:id` - Delete an idea
+
+#### Validation
+- `POST /api/validate` - Start validation job
+- `GET /api/validate/jobs/:jobId` - Get job status
+- `GET /api/validate/jobs/:jobId/stream` - Stream job updates (SSE)
+- `GET /api/validate/jobs/:jobId/progress` - Get job progress
+- `GET /api/validate/jobs/:jobId/tasks` - Get task results
+- `GET /api/validate/ideas/:ideaId/validation` - Get validation report
+
+#### Frameworks
+- `GET /api/frameworks` - List validation frameworks
+- `GET /api/frameworks/:ideaType` - Get framework for idea type
+
+#### Stats
+- `GET /api/stats` - Get application statistics
+
+For detailed API documentation, see [API.md](./docs/API.md) (coming soon).
+
+---
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+**Docker build fails**
+```bash
+# Clean and rebuild
+docker-compose down -v
+docker system prune -a
+docker-compose up --build
+```
+
+**Port already in use**
+```bash
+# Check what's using the port
+lsof -i :3000  # Backend API
+lsof -i :3001  # Frontend (production Docker)
+lsof -i :3002  # Frontend (development Docker)
+lsof -i :5432  # Database
+
+# Kill the process or change ports in docker-compose.yml / docker-compose.dev.yml
+```
+
+**Database connection fails**
+```bash
+# Make sure PostgreSQL is running
+docker-compose ps
+
+# Check DATABASE_URL in .env
+# For Docker, use: postgres:5432
+# For local, use: localhost:5432
+```
+
+**Prisma Client not generated**
+```bash
+# Regenerate Prisma client
+pnpm run db:generate
+
+# Or inside Docker
+docker-compose exec server bun run db:generate
+```
+
+**Hot-reload not working in Docker**
+```bash
+# Make sure you're using the dev override
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+# Check volume mounts are correct
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml config
+```
+
+**CORS errors**
+```bash
+# Verify CORS_ORIGIN matches your frontend URL
+# For production Docker: CORS_ORIGIN=http://localhost:3001
+# For development Docker: CORS_ORIGIN=http://localhost:3002
+# For manual development: CORS_ORIGIN=http://localhost:3001
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+### Quick Contribution Guide
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run linting and type checks (`pnpm run check && pnpm run check-types`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to your branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- Built with [Hono](https://hono.dev) - Fast, lightweight web framework
+- Powered by [OpenAI](https://openai.com) - AI validation
+- Research by [Tavily](https://tavily.com) - AI-powered web search
+- UI by [shadcn/ui](https://ui.shadcn.com) - Beautiful components
+
+---
+
+<div align="center">
+
+**Remember**: A harsh truth now saves months of wasted effort. Good luck! 🚀
+
+[⬆ Back to top](#-idea-sieve---ai-powered-idea-validator)
+
+</div>
