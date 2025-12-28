@@ -1,0 +1,82 @@
+version: '3.8'
+
+# ============================================================================
+# IDEA SIEVE - DOCKER COMPOSE CONFIGURATION (DEVELOPMENT)
+# ============================================================================
+# Development override for docker-compose.yml
+# Enables hot-reload, volume mounting, and development tools
+#
+# Usage:
+# docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Or add an alias to your shell:
+# alias dev-up='docker-compose -f docker-compose.yml -f docker-compose.dev.yml up'
+# ============================================================================
+
+services:
+  # ==========================================================================
+  # Backend API Server (Development Mode)
+  # ==========================================================================
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile.dev
+      target: development
+    environment:
+      - NODE_ENV=development
+    volumes:
+      # Mount source code for hot-reload
+      - ./apps/server:/app/apps/server:delegated
+      - ./packages:/app/packages:delegated
+      # Exclude node_modules from mount
+      - /app/node_modules
+      - /app/apps/server/node_modules
+      - /app/packages/db/node_modules
+      - /app/packages/env/node_modules
+      - /app/packages/ai/node_modules
+    # Run pnpm install to fix workspace links after volume mounts, then start server
+    command: sh -c "cd /app && pnpm install --prefer-offline && cd /app/apps/server && bun run --hot src/index.ts"
+    stdin_open: true
+    tty: true
+
+  # ==========================================================================
+  # Frontend Web Application (Development Mode)
+  # ==========================================================================
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.dev
+      target: development
+    environment:
+      - NODE_ENV=development
+    volumes:
+      # Mount source code for hot-reload
+      - ./apps/web:/app/apps/web:delegated
+      - ./packages:/app/packages:delegated
+      # Exclude node_modules from mount
+      - /app/node_modules
+      - /app/apps/web/node_modules
+      - /app/packages/db/node_modules
+      - /app/packages/env/node_modules
+      - /app/packages/ai/node_modules
+    ports:
+      - "3002:3001"  # Map host port 3002 to container port 3001 (workaround for port allocation issue)
+      - "24678:24678"  # Vite HMR port
+    # Run pnpm install to fix workspace links after volume mounts, then start dev server
+    command: sh -c "cd /app && pnpm install --prefer-offline && cd /app/apps/web && pnpm run dev --host 0.0.0.0"
+    stdin_open: true
+    tty: true
+
+  # ==========================================================================
+  # PostgreSQL (Development Mode with Studio access)
+  # ==========================================================================
+  postgres:
+    ports:
+      - "5432:5432"
+    # Allow access from host for database tools
+    command:
+      - "postgres"
+      - "-c"
+      - "log_statement=all"
+      - "-c"
+      - "log_duration=on"

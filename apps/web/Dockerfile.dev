@@ -1,0 +1,52 @@
+# ============================================================================
+# FRONTEND DOCKERFILE - DEVELOPMENT
+# ============================================================================
+# Development-optimized Dockerfile with hot-reload support
+# ============================================================================
+
+FROM node:22-alpine AS development
+
+WORKDIR /app
+
+# Install pnpm
+RUN corepack enable pnpm
+
+# Copy package manager files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY .npmrc* ./
+
+# Copy all package.json files
+COPY apps/web/package.json ./apps/web/
+COPY packages/db/package.json ./packages/db/
+COPY packages/env/package.json ./packages/env/
+COPY packages/ai/package.json ./packages/ai/
+COPY packages/config/package.json ./packages/config/
+
+# Install all dependencies (including dev dependencies)
+RUN pnpm install --frozen-lockfile
+
+# Copy workspace configuration
+COPY turbo.json ./
+
+# Copy all source code (will be overridden by volume mount)
+COPY apps/web ./apps/web
+COPY packages ./packages
+
+# Generate Prisma client (needed for types)
+# Set dummy DATABASE_URL for build-time generation (not used for actual connection)
+ENV DATABASE_URL="postgresql://dummy:dummy@dummy:5432/dummy"
+RUN cd packages/db && npx prisma generate
+
+# Set working directory
+WORKDIR /app/apps/web
+
+# Expose Vite dev server port and HMR port
+EXPOSE 3001
+EXPOSE 24678
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:3001 || exit 1
+
+# Start Vite dev server with hot-reload
+CMD ["pnpm", "run", "dev", "--host", "0.0.0.0"]
