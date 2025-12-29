@@ -15,6 +15,14 @@ Built with TypeScript, React, Hono, [AI SDK](https://ai-sdk.dev/), and OpenAI �
 
 </div>
 
+## 🎬 Demo
+
+
+
+https://github.com/user-attachments/assets/69e9de14-926b-4caf-bb69-6a515bee4b2c
+
+
+
 ---
 
 ## 🚀 Quick Start with Docker (Recommended)
